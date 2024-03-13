@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash</title>
+    <style>
+        #alert {
+            padding: 1rem;
+            font-size: 2rem;
+            text-transform: uppercase;
+        }
+
+        .on {
+            color: greenyellow;
+        }
+
+        .off {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flash... ahaaaaa.... </h1>
+    <p>Savior of the Universe...</p>
+    <button id="btnOn">Led On</button>
+    <button id="btnOff">Led Off</button>
+    <br>    
+    <div id="alert">
+        LED IS... ON
+    </div>   
+    <script>
+        const flash = new Audio('https://rogerthat.be/flash.mp3');
+        let lastState = false;
+        const ledOn = document.querySelector('#btnOn');
+        const ledOff = document.querySelector('#btnOff');
+        const alert = document.querySelector('#alert')
+
+        ledOn.onclick = async (e) => {
+            const res = await fetch('/led/on');
+            const json = await res.json();
+            console.log(json);
+        }
+        ledOff.onclick = async (e) => {
+            const res = await fetch('/led/off');
+            const json = await res.json();
+            console.log(json);
+        }
+
+        // polling
+        setInterval(async () => {
+            const res = await fetch('/led/status');
+            const ledStatus = await res.json();
+            if(ledStatus.isLit) {
+                alert.innerText  = 'Ledje aan';
+                alert.className = "on";
+                if(lastState == false) {
+                    flash.play();
+                    lastState = true;
+                }
+            } else {
+                alert.innerText = 'Ledje uit';
+                alert.className =    "off";
+                lastState = false;
+            }
+        }, 5000)
+    </script>
+</body>
+</html>
